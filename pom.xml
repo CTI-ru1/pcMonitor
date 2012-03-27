@@ -1,0 +1,160 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>pcMonitor</groupId>
+    <artifactId>pcMonitor</artifactId>
+    <version>1.0</version>
+
+    <repositories>
+        <repository>
+            <id>repository.ru1</id>
+            <url>http://ru1.cti.gr/maven</url>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
+            <layout>default</layout>
+        </repository>
+    </repositories>
+
+    <dependencies>
+        <dependency>
+            <groupId>log4j</groupId>
+            <artifactId>log4j</artifactId>
+            <version>1.2.9</version>
+        </dependency>
+        <dependency>
+            <groupId>uberdust</groupId>
+            <artifactId>NetworkManager</artifactId>
+            <version>1.0</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-pmd-plugin</artifactId>
+            <version>2.7</version>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <resources>
+            <resource>
+                <directory>src/main/resources</directory>
+                <filtering>true</filtering>
+            </resource>
+        </resources>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>2.12</version>
+                <configuration>
+                    <skipTests>true</skipTests>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.dstovall</groupId>
+                <artifactId>onejar-maven-plugin</artifactId>
+                <version>1.4.1</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>one-jar</goal>
+                        </goals>
+                        <configuration>
+                            <mainClass>eu.uberdust.pcmonitor.PcMonitor</mainClass>
+                        </configuration>
+                    </execution>
+
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <source>1.6</source>
+                    <target>1.6</target>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+
+
+    <distributionManagement>
+        <!-- use the following if you're not using a snapshot version. -->
+        <repository>
+            <id>repository.ru1</id>
+            <name>Ru1 Repo</name>
+            <url>scp://ru1.cti.gr/srv/maven</url>
+        </repository>
+    </distributionManagement>
+
+    <pluginRepositories>
+        <pluginRepository>
+            <id>onejar-maven-plugin.googlecode.com</id>
+            <url>http://onejar-maven-plugin.googlecode.com/svn/mavenrepo</url>
+        </pluginRepository>
+    </pluginRepositories>
+    <reporting>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-checkstyle-plugin</artifactId>
+                <version>2.8</version>
+                <configuration>
+                    <configLocation>sun_checks.xml</configLocation>
+                    <suppressionsLocation>suppresions.xml</suppressionsLocation>
+                    <excludes>**/protobuf/**/*</excludes>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-pmd-plugin</artifactId>
+                <version>2.7</version>
+                <configuration><!--linkXref>true</linkXref-->
+                    <sourceEncoding>utf-8</sourceEncoding>
+                    <minimumTokens>100</minimumTokens>
+                    <targetJdk>1.6</targetJdk>
+                    <excludes>
+                        <exclude>**/test/**</exclude>
+                    </excludes>
+                    <rulesets>
+                        <ruleset>rulesets/basic.xml</ruleset>
+                        <ruleset>rulesets/braces.xml</ruleset>
+                        <ruleset>rulesets/clone.xml</ruleset>
+                        <ruleset>rulesets/codesize.xml</ruleset>
+                        <ruleset>rulesets/coupling.xml</ruleset>
+                        <ruleset>rulesets/design.xml</ruleset>
+                        <ruleset>rulesets/finalizers.xml</ruleset>
+                        <ruleset>rulesets/imports.xml</ruleset>
+                        <ruleset>rulesets/j2ee.xml</ruleset>
+                        <ruleset>rulesets/javabeans.xml</ruleset>
+                        <ruleset>rulesets/junit.xml</ruleset>
+                        <ruleset>rulesets/logging-jakarta-commons.xml</ruleset>
+                        <ruleset>rulesets/logging-java.xml</ruleset>
+                        <ruleset>rulesets/migrating.xml</ruleset>
+                        <ruleset>rulesets/naming.xml</ruleset>
+                        <ruleset>rulesets/optimizations.xml</ruleset>
+                        <ruleset>rulesets/strictexception.xml</ruleset>
+                        <ruleset>rulesets/strings.xml</ruleset>
+                        <ruleset>rulesets/sunsecure.xml</ruleset>
+                        <ruleset>rulesets/unusedcode.xml</ruleset>
+                    </rulesets>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>findbugs-maven-plugin</artifactId>
+                <version>2.4.1-SNAPSHOT</version>
+                <configuration>
+                    <!--<findbugsXmlOutput>true</findbugsXmlOutput>-->
+                    <!-- Optional directory to put findbugs xml report -->
+                    <findbugsXmlOutputDirectory>target/site</findbugsXmlOutputDirectory>
+                </configuration>
+            </plugin>
+        </plugins>
+    </reporting>
+
+
+</project>
