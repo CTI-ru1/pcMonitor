@@ -85,9 +85,9 @@ public class DiskTemp extends AbstractJob {
     }
 
     /**
-     * testing main
+     * testing main.
      *
-     * @param args none
+     * @param args none.
      */
     public static void main(final String[] args) {
         final DiskTemp item = new DiskTemp();
