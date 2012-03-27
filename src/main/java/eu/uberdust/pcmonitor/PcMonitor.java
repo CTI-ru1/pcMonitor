@@ -25,19 +25,23 @@ import java.util.Properties;
 public class PcMonitor {
     private static final org.apache.log4j.Logger LOGGER = org.apache.log4j.Logger.getLogger(PcMonitor.class);
     public static String hostname;
-    public static String prefix = "";
-    public static String testbed_server = "";
+    private static String prefix = "";
+    private static String testbedServer = "";
 
     public static void main(final String[] args) {
         PropertyConfigurator.configure(Thread.currentThread().getContextClassLoader().getResource("log4j.properties"));
-        Properties properties = new Properties();
+        final Properties properties = new Properties();
 
         try {
             properties.load(new FileInputStream(System.getProperty("user.home") + "/.pcmonitor"));
-            if (!properties.contains("testbed_server")) errorMessage();
-            if (!properties.contains("prefix")) errorMessage();
+            if (!properties.contains("testbed_server")) {
+                errorMessage();
+            }
+            if (!properties.contains("prefix")) {
+                errorMessage();
+            }
 
-            testbed_server = (String) properties.get("testbed_server");
+            testbedServer = (String) properties.get("testbed_server");
 
             prefix = (String) properties.get("prefix");
 
@@ -50,22 +54,7 @@ public class PcMonitor {
         hostname = getHostname();
 
         while (true) {
-            DiskFree diskFree = new DiskFree();
-            new RestCommiter(diskFree.getReadings());
-            CpuUsage cpuUsage = new CpuUsage();
-            new RestCommiter(cpuUsage.getReadings());
-            BatteryCharge batteryCharge = new BatteryCharge();
-            new RestCommiter(batteryCharge.getReadings());
-            HostAlive hostAlive = new HostAlive();
-            new RestCommiter(hostAlive.getReadings());
-            KernelVersion kernelVersion = new KernelVersion();
-            new RestCommiter(kernelVersion.getReadings());
-            MemFree memFree = new MemFree();
-            new RestCommiter(memFree.getReadings());
-            UpTime uptime = new UpTime();
-            new RestCommiter(uptime.getReadings());
-            DiskTemp diskTemp = new DiskTemp();
-            new RestCommiter(diskTemp.getReadings());
+            runAll();
 
             try {
                 Thread.sleep(30 * 60 * 1000);
@@ -76,6 +65,25 @@ public class PcMonitor {
         }
     }
 
+    private static void runAll() {
+        final DiskFree diskFree = new DiskFree();
+        new RestCommiter(diskFree.getReadings());
+        final CpuUsage cpuUsage = new CpuUsage();
+        new RestCommiter(cpuUsage.getReadings());
+        final BatteryCharge batteryCharge = new BatteryCharge();
+        new RestCommiter(batteryCharge.getReadings());
+        final HostAlive hostAlive = new HostAlive();
+        new RestCommiter(hostAlive.getReadings());
+        final KernelVersion kernelVersion = new KernelVersion();
+        new RestCommiter(kernelVersion.getReadings());
+        final MemFree memFree = new MemFree();
+        new RestCommiter(memFree.getReadings());
+        final UpTime uptime = new UpTime();
+        new RestCommiter(uptime.getReadings());
+        final DiskTemp diskTemp = new DiskTemp();
+        new RestCommiter(diskTemp.getReadings());
+    }
+
     private static void errorMessage() {
         LOGGER.fatal("No Property file detected please create a .pcmonitor file in user.home");
         LOGGER.fatal("The property file should contain the testbed_server and prefix");
@@ -84,21 +92,35 @@ public class PcMonitor {
 
 
     private static String getHostname() {
+        InputStreamReader stream = null;
         try {
-            Process runtime = Runtime.getRuntime().exec("hostname");
+            final Process runtime = Runtime.getRuntime().exec("hostname");
             runtime.waitFor();
-            BufferedReader reader = new BufferedReader(new InputStreamReader(runtime.getInputStream()));
-            String line = reader.readLine();
+            stream = new InputStreamReader(runtime.getInputStream());
+            BufferedReader reader = new BufferedReader(stream);
+            final String line = reader.readLine();
             while (line != null) {
-
                 return line;
             }
-
         } catch (IOException e) {
             LOGGER.fatal(e);
         } catch (InterruptedException e) {
-            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+            LOGGER.fatal(e);
+        } finally {
+            try {
+                stream.close();
+            } catch (IOException e) {
+                LOGGER.error(e);
+            }
         }
         return "";
+    }
+
+    public static String getPrefix() {
+        return prefix;
+    }
+
+    public static String getTestbedServer() {
+        return testbedServer;
     }
 }

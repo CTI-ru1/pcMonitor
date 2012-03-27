@@ -15,34 +15,43 @@ import java.io.InputStreamReader;
  */
 public class KernelVersion extends AbstractJob {
     private static final org.apache.log4j.Logger LOGGER = org.apache.log4j.Logger.getLogger(KernelVersion.class);
-    private String kernel;
+    private transient String kernel;
+
 
     public KernelVersion() {
 
+        InputStreamReader stream = null;
         try {
-            Process runtime = Runtime.getRuntime().exec("uname -r");
+            final Process runtime = Runtime.getRuntime().exec("uname -r");
             runtime.waitFor();
-            BufferedReader reader = new BufferedReader(new InputStreamReader(runtime.getInputStream()));
+            stream = new InputStreamReader(runtime.getInputStream());
+            final BufferedReader reader = new BufferedReader(stream);
             String line = reader.readLine();
             while (line != null) {
-                String[] parts = line.split("\\s+");
+                final String[] parts = line.split("\\s+");
                 kernel = parts[0];
                 line = reader.readLine();
             }
         } catch (IOException e) {
             LOGGER.fatal(e);
         } catch (InterruptedException e) {
-            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+            LOGGER.error(e);
+        } finally {
+            try {
+                stream.close();
+            } catch (IOException e) {
+                LOGGER.error(e);
+            }
         }
     }
 
     public Message.NodeReadings getReadings() {
         final Message.NodeReadings.Builder readings = Message.NodeReadings.newBuilder();
 
-        Message.NodeReadings.Reading.Builder reading = Message.NodeReadings.Reading.newBuilder();
-        reading.setNode(PcMonitor.prefix + PcMonitor.hostname);
+        final Message.NodeReadings.Reading.Builder reading = Message.NodeReadings.Reading.newBuilder();
+        reading.setNode(PcMonitor.getPrefix() + PcMonitor.hostname);
         final StringBuilder capability = new StringBuilder()
-                .append(PcMonitor.prefix)
+                .append(PcMonitor.getPrefix())
                 .append(CAPABILITY_PREFIX)
                 .append("kernel");
         reading.setCapability(capability.toString());

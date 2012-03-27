@@ -29,12 +29,10 @@ public class RestCommiter {
      */
     public RestCommiter(final Message.NodeReadings nodeReadings) {
         if (nodeReadings != null) {
-            for (Message.NodeReadings.Reading reading : nodeReadings.getReadingList()) {
-
-
+            for (final Message.NodeReadings.Reading reading : nodeReadings.getReadingList()) {
                 if (reading.hasDoubleReading()) {
 
-                    final StringBuilder urlBuilder = new StringBuilder(PcMonitor.testbed_server);
+                    final StringBuilder urlBuilder = new StringBuilder(PcMonitor.getTestbedServer());
                     //node/urn:testbed2:test/capability/testingcap/insert/timestamp/11111111000/reading/27.2/
                     urlBuilder.append("node/").append(reading.getNode())
                             .append("/capability/").append(reading.getCapability())
@@ -45,7 +43,7 @@ public class RestCommiter {
                     callUrl(urlBuilder.toString());
                 } else if (reading.hasStringReading()) {
 
-                    final StringBuilder urlBuilder = new StringBuilder(PcMonitor.testbed_server);
+                    final StringBuilder urlBuilder = new StringBuilder(PcMonitor.getTestbedServer());
                     //node/urn:testbed2:test/capability/testingcap/insert/timestamp/11111111000/reading/27.2/
                     urlBuilder.append("node/").append(reading.getNode())
                             .append("/capability/").append(reading.getCapability())

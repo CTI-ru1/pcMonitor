@@ -13,16 +13,16 @@ public class HostAlive extends AbstractJob {
     private static final org.apache.log4j.Logger LOGGER = org.apache.log4j.Logger.getLogger(HostAlive.class);
 
     public HostAlive() {
-
+        LOGGER.debug("HostAlive");
     }
 
     public Message.NodeReadings getReadings() {
-        final Message.NodeReadings.Builder readings = Message.NodeReadings.newBuilder();
 
-        Message.NodeReadings.Reading.Builder reading = Message.NodeReadings.Reading.newBuilder();
-        reading.setNode(PcMonitor.prefix + PcMonitor.hostname);
+        final Message.NodeReadings.Builder readings = Message.NodeReadings.newBuilder();
+        final Message.NodeReadings.Reading.Builder reading = Message.NodeReadings.Reading.newBuilder();
+        reading.setNode(PcMonitor.getPrefix() + PcMonitor.hostname);
         final StringBuilder capability = new StringBuilder()
-                .append(PcMonitor.prefix)
+                .append(PcMonitor.getPrefix())
                 .append(CAPABILITY_PREFIX)
                 .append("status");
         reading.setCapability(capability.toString());

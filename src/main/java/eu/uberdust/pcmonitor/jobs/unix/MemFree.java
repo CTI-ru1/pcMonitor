@@ -15,23 +15,25 @@ import java.io.InputStreamReader;
  */
 public class MemFree extends AbstractJob {
     private static final org.apache.log4j.Logger LOGGER = org.apache.log4j.Logger.getLogger(MemFree.class);
-    private double memFree;
-    private double swapFree;
+    private transient double memFree;
+    private transient double swapFree;
 
 
     public MemFree() {
 
+        InputStreamReader stream = null;
         try {
-            Process runtime = Runtime.getRuntime().exec("cat /proc/meminfo");
+            final Process runtime = Runtime.getRuntime().exec("cat /proc/meminfo");
             runtime.waitFor();
-            BufferedReader reader = new BufferedReader(new InputStreamReader(runtime.getInputStream()));
+            stream = new InputStreamReader(runtime.getInputStream());
+            final BufferedReader reader = new BufferedReader(stream);
             String line = reader.readLine();
             while (line != null) {
                 if (line.startsWith("MemFree")) {
-                    String[] parts = line.split("\\s+");
+                    final String[] parts = line.split("\\s+");
                     memFree = Double.parseDouble(parts[1]);
                 } else if (line.startsWith("SwapFree")) {
-                    String[] parts = line.split("\\s+");
+                    final String[] parts = line.split("\\s+");
                     swapFree = Double.parseDouble(parts[1]);
                 }
                 line = reader.readLine();
@@ -39,7 +41,13 @@ public class MemFree extends AbstractJob {
         } catch (IOException e) {
             LOGGER.fatal(e);
         } catch (InterruptedException e) {
-            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+            LOGGER.error(e);
+        } finally {
+            try {
+                stream.close();
+            } catch (IOException e) {
+                LOGGER.error(e);
+            }
         }
     }
 
@@ -47,10 +55,10 @@ public class MemFree extends AbstractJob {
         final Message.NodeReadings.Builder readings = Message.NodeReadings.newBuilder();
 
         {
-            Message.NodeReadings.Reading.Builder reading = Message.NodeReadings.Reading.newBuilder();
-            reading.setNode(PcMonitor.prefix + PcMonitor.hostname);
+            final Message.NodeReadings.Reading.Builder reading = Message.NodeReadings.Reading.newBuilder();
+            reading.setNode(PcMonitor.getPrefix() + PcMonitor.hostname);
             final StringBuilder capability = new StringBuilder()
-                    .append(PcMonitor.prefix)
+                    .append(PcMonitor.getPrefix())
                     .append(CAPABILITY_PREFIX)
                     .append("memfree");
             reading.setCapability(capability.toString());
@@ -59,10 +67,10 @@ public class MemFree extends AbstractJob {
             readings.addReading(reading.build());
         }
         {
-            Message.NodeReadings.Reading.Builder reading = Message.NodeReadings.Reading.newBuilder();
-            reading.setNode(PcMonitor.prefix + PcMonitor.hostname);
+            final Message.NodeReadings.Reading.Builder reading = Message.NodeReadings.Reading.newBuilder();
+            reading.setNode(PcMonitor.getPrefix() + PcMonitor.hostname);
             final StringBuilder capability = new StringBuilder()
-                    .append(PcMonitor.prefix)
+                    .append(PcMonitor.getPrefix())
                     .append(CAPABILITY_PREFIX)
                     .append("swapfree");
             reading.setCapability(capability.toString());

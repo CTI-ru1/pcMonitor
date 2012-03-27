@@ -20,15 +20,17 @@ public class BatteryCharge extends AbstractJob {
     public BatteryCharge() {
 
 
+        InputStreamReader stream = null;
         try {
-            Process runtime = Runtime.getRuntime().exec("df -T");
+            final Process runtime = Runtime.getRuntime().exec("df -T");
             runtime.waitFor();
-            BufferedReader reader = new BufferedReader(new InputStreamReader(runtime.getInputStream()));
+            stream = new InputStreamReader(runtime.getInputStream());
+            final BufferedReader reader = new BufferedReader(stream);
             String line = reader.readLine();
             while (line != null) {
                 if (line.contains("Battery")) {
-                    String[] parts = line.split("\\s+");
-                    charge = Double.parseDouble(parts[3].substring(0, parts[3].indexOf("%")));
+                    final String[] parts = line.split("\\s+");
+                    charge = Double.parseDouble(parts[3].substring(0, parts[3].indexOf('%')));
                 }
                 line = reader.readLine();
             }
@@ -36,7 +38,13 @@ public class BatteryCharge extends AbstractJob {
         } catch (IOException e) {
             LOGGER.fatal(e);
         } catch (InterruptedException e) {
-            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+            LOGGER.error(e);
+        } finally {
+            try {
+                stream.close();
+            } catch (IOException e) {
+                LOGGER.error(e);
+            }
         }
     }
 
@@ -46,9 +54,9 @@ public class BatteryCharge extends AbstractJob {
 
 
             Message.NodeReadings.Reading.Builder reading = Message.NodeReadings.Reading.newBuilder();
-            reading.setNode(PcMonitor.prefix + PcMonitor.hostname);
+            reading.setNode(PcMonitor.getPrefix() + PcMonitor.hostname);
             final StringBuilder capability = new StringBuilder()
-                    .append(PcMonitor.prefix)
+                    .append(PcMonitor.getPrefix())
                     .append(CAPABILITY_PREFIX)
                     .append("charge");
             reading.setCapability(capability.toString());

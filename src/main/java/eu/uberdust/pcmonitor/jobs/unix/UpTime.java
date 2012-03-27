@@ -22,33 +22,35 @@ public class UpTime extends AbstractJob {
     public UpTime() {
         uptime = (double) 0;
 
+        InputStreamReader stream = null;
         try {
-            Process runtime = Runtime.getRuntime().exec("uptime");
+            final Process runtime = Runtime.getRuntime().exec("uptime");
             runtime.waitFor();
-            BufferedReader reader = new BufferedReader(new InputStreamReader(runtime.getInputStream()));
+            stream = new InputStreamReader(runtime.getInputStream());
+            final BufferedReader reader = new BufferedReader(stream);
             String line = reader.readLine();
             if (line != null) {
-                for (String part : line.split(",")) {
+                for (final String part : line.split(",")) {
 
                     if (part.contains("user")) {
                         users = Double.valueOf(part.split("\\s+")[1]);
                     } else if (part.contains("days")) {
-                        String uptimeStr = part.substring(part.indexOf("up") + 2);
+                        final String uptimeStr = part.substring(part.indexOf("up") + 2);
                         uptime += Double.valueOf(uptimeStr.split(" ")[1]) * 24 * 60;
                         LOGGER.info(uptimeStr);
                     } else if (part.contains("min")) {
-                        String uptimeStr = part.substring(0, part.indexOf("min"));
+                        final String uptimeStr = part.substring(0, part.indexOf("min"));
                         uptime += Double.valueOf(uptimeStr);
                         LOGGER.info(uptimeStr);
                     } else if (part.contains(":")) {
-                        String[] uptimeStr = part.split(":");
+                        final String[] uptimeStr = part.split(":");
                         try {
                             uptime += Double.valueOf(uptimeStr[0]) * 60;
                             LOGGER.info("+" + Double.valueOf(uptimeStr[0]) * 60);
                             uptime += Double.valueOf(uptimeStr[1]);
                             LOGGER.info("+" + Double.valueOf(uptimeStr[1]));
-                        } catch (NumberFormatException nfe) {
-
+                        } catch (final NumberFormatException nfe) {
+                            LOGGER.error(nfe);
                         }
                     }
                 }
@@ -57,7 +59,13 @@ public class UpTime extends AbstractJob {
         } catch (IOException e) {
             LOGGER.fatal(e);
         } catch (InterruptedException e) {
-            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+            LOGGER.error(e);
+        } finally {
+            try {
+                stream.close();
+            } catch (IOException e) {
+                LOGGER.error(e);
+            }
         }
     }
 
@@ -65,10 +73,10 @@ public class UpTime extends AbstractJob {
         final Message.NodeReadings.Builder readings = Message.NodeReadings.newBuilder();
 
         {
-            Message.NodeReadings.Reading.Builder reading = Message.NodeReadings.Reading.newBuilder();
-            reading.setNode(PcMonitor.prefix + PcMonitor.hostname);
+            final Message.NodeReadings.Reading.Builder reading = Message.NodeReadings.Reading.newBuilder();
+            reading.setNode(PcMonitor.getPrefix() + PcMonitor.hostname);
             final StringBuilder capability = new StringBuilder()
-                    .append(PcMonitor.prefix)
+                    .append(PcMonitor.getPrefix())
                     .append(CAPABILITY_PREFIX)
                     .append("users");
             reading.setCapability(capability.toString());
@@ -77,10 +85,10 @@ public class UpTime extends AbstractJob {
             readings.addReading(reading.build());
         }
         {
-            Message.NodeReadings.Reading.Builder reading = Message.NodeReadings.Reading.newBuilder();
-            reading.setNode(PcMonitor.prefix + PcMonitor.hostname);
+            final Message.NodeReadings.Reading.Builder reading = Message.NodeReadings.Reading.newBuilder();
+            reading.setNode(PcMonitor.getPrefix() + PcMonitor.hostname);
             final StringBuilder capability = new StringBuilder()
-                    .append(PcMonitor.prefix)
+                    .append(PcMonitor.getPrefix())
                     .append(CAPABILITY_PREFIX)
                     .append("uptime");
             reading.setCapability(capability.toString());
@@ -92,8 +100,8 @@ public class UpTime extends AbstractJob {
         return readings.build();
     }
 
-    public static void main(String[] args) {
-        UpTime item = new UpTime();
+    public static void main(final String[] args) {
+        final UpTime item = new UpTime();
         LOGGER.info(item.getReadings());
 
     }

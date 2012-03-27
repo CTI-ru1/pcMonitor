@@ -22,17 +22,19 @@ public class DiskFree extends AbstractJob {
     public DiskFree() {
         disks = new HashMap<String, Double>();
 
+        InputStreamReader stream = null;
         try {
-            Process runtime = Runtime.getRuntime().exec("df -T");
+            final Process runtime = Runtime.getRuntime().exec("df -T");
             runtime.waitFor();
-            BufferedReader reader = new BufferedReader(new InputStreamReader(runtime.getInputStream()));
+            stream = new InputStreamReader(runtime.getInputStream());
+            final BufferedReader reader = new BufferedReader(stream);
             String line = reader.readLine();
             line = reader.readLine();
             while (line != null) {
-                String[] parts = line.split("\\s+");
+                final String[] parts = line.split("\\s+");
                 if (parts[1].equals("ext4")) {
 
-                    disks.put(parts[0].substring(parts[0].lastIndexOf("/") + 1), Double.valueOf(parts[4].substring(0, parts[5].indexOf("%"))));
+                    disks.put(parts[0].substring(parts[0].lastIndexOf('/') + 1), Double.valueOf(parts[4].substring(0, parts[5].indexOf('%'))));
                 }
                 line = reader.readLine();
             }
@@ -40,7 +42,13 @@ public class DiskFree extends AbstractJob {
         } catch (IOException e) {
             LOGGER.fatal(e);
         } catch (InterruptedException e) {
-            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+            LOGGER.error(e);
+        } finally {
+            try {
+                stream.close();
+            } catch (IOException e) {
+                LOGGER.error(e);
+            }
         }
     }
 
@@ -49,10 +57,10 @@ public class DiskFree extends AbstractJob {
 
 
         for (final String disk : disks.keySet()) {
-            Message.NodeReadings.Reading.Builder reading = Message.NodeReadings.Reading.newBuilder();
-            reading.setNode(PcMonitor.prefix + PcMonitor.hostname);
+            final Message.NodeReadings.Reading.Builder reading = Message.NodeReadings.Reading.newBuilder();
+            reading.setNode(PcMonitor.getPrefix() + PcMonitor.hostname);
             final StringBuilder capability = new StringBuilder()
-                    .append(PcMonitor.prefix)
+                    .append(PcMonitor.getPrefix())
                     .append(CAPABILITY_PREFIX)
                     .append(disk).append(":usage");
             reading.setCapability(capability.toString());

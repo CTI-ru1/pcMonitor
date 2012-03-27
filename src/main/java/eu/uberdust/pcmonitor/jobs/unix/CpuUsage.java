@@ -15,19 +15,21 @@ import java.io.InputStreamReader;
  */
 public class CpuUsage extends AbstractJob {
     private static final org.apache.log4j.Logger LOGGER = org.apache.log4j.Logger.getLogger(CpuUsage.class);
-    private double usage;
+    private transient double usage;
 
     public CpuUsage() {
 
 
+        InputStreamReader stream = null;
         try {
-            Process runtime = Runtime.getRuntime().exec("mpstat");
+            final Process runtime = Runtime.getRuntime().exec("mpstat");
             runtime.waitFor();
-            BufferedReader reader = new BufferedReader(new InputStreamReader(runtime.getInputStream()));
+            stream = new InputStreamReader(runtime.getInputStream());
+            final BufferedReader reader = new BufferedReader(stream);
             String line = reader.readLine();
             while (line != null) {
                 if (line.contains("all")) {
-                    String[] parts = line.split("\\s+");
+                    final String[] parts = line.split("\\s+");
                     usage = Double.parseDouble(parts[3]);
                     break;
                 }
@@ -37,7 +39,13 @@ public class CpuUsage extends AbstractJob {
         } catch (IOException e) {
             LOGGER.fatal(e);
         } catch (InterruptedException e) {
-            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+            LOGGER.error(e);
+        } finally {
+            try {
+                stream.close();
+            } catch (IOException e) {
+                LOGGER.error(e);
+            }
         }
     }
 
@@ -45,10 +53,10 @@ public class CpuUsage extends AbstractJob {
         final Message.NodeReadings.Builder readings = Message.NodeReadings.newBuilder();
 
 
-        Message.NodeReadings.Reading.Builder reading = Message.NodeReadings.Reading.newBuilder();
-        reading.setNode(PcMonitor.prefix + PcMonitor.hostname);
+        final Message.NodeReadings.Reading.Builder reading = Message.NodeReadings.Reading.newBuilder();
+        reading.setNode(PcMonitor.getPrefix() + PcMonitor.hostname);
         final StringBuilder capability = new StringBuilder()
-                .append(PcMonitor.prefix)
+                .append(PcMonitor.getPrefix())
                 .append(CAPABILITY_PREFIX)
                 .append("cpu:usage");
         reading.setCapability(capability.toString());
@@ -60,8 +68,8 @@ public class CpuUsage extends AbstractJob {
     }
 
 
-    public static void main(String[] args) {
-        CpuUsage item = new CpuUsage();
+    public static void main(final String[] args) {
+        final CpuUsage item = new CpuUsage();
         LOGGER.info(item.getReadings());
 
     }

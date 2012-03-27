@@ -22,16 +22,18 @@ public class DiskTemp extends AbstractJob {
     public DiskTemp() {
         disks = new HashMap<String, Double>();
 
+
+        InputStreamReader stream = null;
         try {
-            Process runtime = Runtime.getRuntime().exec("hddtemp /dev/sda /dev/sdb /dev/sdc /dev/sdd /dev/sde /dev/sdf");
+            final Process runtime = Runtime.getRuntime().exec("hddtemp /dev/sda /dev/sdb /dev/sdc /dev/sdd /dev/sde /dev/sdf");
             runtime.waitFor();
-            BufferedReader reader = new BufferedReader(new InputStreamReader(runtime.getInputStream()));
+            stream = new InputStreamReader(runtime.getInputStream());
+            final BufferedReader reader = new BufferedReader(stream);
             String line = reader.readLine();
             while (line != null) {
-                LOGGER.info(line);
-                String[] parts = line.split("\\s+");
+                final String[] parts = line.split("\\s+");
 
-                disks.put(parts[0].substring(parts[0].lastIndexOf("/") + 1, parts[0].indexOf(":")),
+                disks.put(parts[0].substring(parts[0].lastIndexOf('/') + 1, parts[0].indexOf(':')),
                         Double.valueOf(parts[parts.length - 1].substring(0, parts[parts.length - 1].indexOf("°"))));
                 line = reader.readLine();
             }
@@ -39,7 +41,13 @@ public class DiskTemp extends AbstractJob {
         } catch (IOException e) {
             LOGGER.fatal(e);
         } catch (InterruptedException e) {
-            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+            LOGGER.error(e);
+        } finally {
+            try {
+                stream.close();
+            } catch (IOException e) {
+                LOGGER.error(e);
+            }
         }
     }
 
@@ -48,10 +56,10 @@ public class DiskTemp extends AbstractJob {
 
 
         for (final String disk : disks.keySet()) {
-            Message.NodeReadings.Reading.Builder reading = Message.NodeReadings.Reading.newBuilder();
-            reading.setNode(PcMonitor.prefix + PcMonitor.hostname);
+            final Message.NodeReadings.Reading.Builder reading = Message.NodeReadings.Reading.newBuilder();
+            reading.setNode(PcMonitor.getPrefix() + PcMonitor.hostname);
             final StringBuilder capability = new StringBuilder()
-                    .append(PcMonitor.prefix)
+                    .append(PcMonitor.getPrefix())
                     .append(CAPABILITY_PREFIX)
                     .append(disk).append(":temperature");
             reading.setCapability(capability.toString());
@@ -62,8 +70,8 @@ public class DiskTemp extends AbstractJob {
         return readings.build();
     }
 
-    public static void main(String[] args) {
-        DiskTemp item = new DiskTemp();
+    public static void main(final String[] args) {
+        final DiskTemp item = new DiskTemp();
         LOGGER.info(item.getReadings());
 
     }
