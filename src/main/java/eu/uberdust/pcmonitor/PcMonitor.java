@@ -99,13 +99,13 @@ public final class PcMonitor {
      * @param osName the name of the OS.
      */
     private static void runAll(final String osName) {
-        if (osName.equals("Linux")) {
+        if ("Linux".equals(osName)) {
             runUnix();
-        } else if (osName.equals("Mac OS")) {
+        } else if ("Mac OS".equals(osName)) {
             LOGGER.error("unavailable for " + osName);
         } else if ("Mac OS X".equals(osName)) {
             LOGGER.error("unavailable for " + osName);
-        } else if (osName.contains("Windows")) {
+        } else if ("Windows".contains(osName)) {
             LOGGER.error("unavailable for " + osName);
         }
     }
