@@ -16,9 +16,18 @@ import java.util.Map;
  * Time: 9:22 PM
  */
 public class DiskFree extends AbstractJob {
+    /**
+     * LOGGER.
+     */
     private static final org.apache.log4j.Logger LOGGER = org.apache.log4j.Logger.getLogger(DiskFree.class);
-    private transient final Map<String, Double> disks;
+    /**
+     * Disk Free Space.
+     */
+    private final transient Map<String, Double> disks;
 
+    /**
+     * Constructor.
+     */
     public DiskFree() {
         disks = new HashMap<String, Double>();
 
@@ -33,7 +42,9 @@ public class DiskFree extends AbstractJob {
             while (line != null) {
                 final String[] parts = line.split("\\s+");
                 if (parts[1].equals("ext4")) {
-                    disks.put(parts[0].substring(parts[0].lastIndexOf('/') + 1), Double.valueOf(parts[4].substring(0, parts[5].indexOf('%'))));
+                    final String name = parts[0].substring(parts[0].lastIndexOf('/') + 1);
+                    final Double space = Double.valueOf(parts[4].substring(0, parts[5].indexOf('%')));
+                    disks.put(name, space);
                 }
                 line = reader.readLine();
             }
@@ -51,7 +62,7 @@ public class DiskFree extends AbstractJob {
         }
     }
 
-    public Message.NodeReadings getReadings() {
+    public final Message.NodeReadings getReadings() {
         final Message.NodeReadings.Builder readings = Message.NodeReadings.newBuilder();
 
 

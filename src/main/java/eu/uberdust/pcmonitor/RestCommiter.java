@@ -40,6 +40,11 @@ public class RestCommiter {
         }
     }
 
+    /**
+     * sends a new StringNodeReading to the server.
+     *
+     * @param reading the reading to send.
+     */
     private void sendStringReading(final Message.NodeReadings.Reading reading) {
         final StringBuilder urlBuilder = new StringBuilder(PcMonitor.getTestbedServer());
         //node/urn:testbed2:test/capability/testingcap/insert/timestamp/11111111000/reading/27.2/
@@ -52,6 +57,11 @@ public class RestCommiter {
         callUrl(urlBuilder.toString());
     }
 
+    /**
+     * sends a new DoubleNodeReading to the server.
+     *
+     * @param reading the reading to send.
+     */
     private void sendDoubleReading(final Message.NodeReadings.Reading reading) {
         final StringBuilder urlBuilder = new StringBuilder(PcMonitor.getTestbedServer());
         //node/urn:testbed2:test/capability/testingcap/insert/timestamp/11111111000/reading/27.2/
@@ -63,27 +73,6 @@ public class RestCommiter {
         LOGGER.info(urlBuilder.toString());
         callUrl(urlBuilder.toString());
     }
-//
-//    /**
-//     * Adds a new link reading using the rest interfaces.
-//     *
-//     * @param linkReading the link reading to add
-//     */
-//    public RestCommiter(final Message.LinkReadings.Reading linkReading) {
-//        final StringBuilder urlBuilder = new StringBuilder(TESTBED_SERVER);
-//        /**
-//         * TODO: Implementation is Missing.
-//         */
-//        LOGGER.fatal("Not Implemented...");
-//        throw new RuntimeException("Not Implemented...");
-///*
-//
-//        urlBuilder.append(linkReading.toRestString());
-//        final String insertReadingUrl = urlBuilder.toString();
-//        callUrl(insertReadingUrl);
-//*/
-//
-//    }
 
     /**
      * Opens a connection over the Rest Interfaces to the server and adds the event.

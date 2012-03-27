@@ -23,12 +23,39 @@ import java.util.Properties;
  * Time: 9:06 PM
  */
 public class PcMonitor {
+    /**
+     * LOGGER.
+     */
     private static final org.apache.log4j.Logger LOGGER = org.apache.log4j.Logger.getLogger(PcMonitor.class);
-
+    /**
+     * Sampling interval.
+     */
+    private static final long INTERVALL = 30 * 60 * 1000;
+    /**
+     * local Hostname.
+     */
     private static String hostname;
+    /**
+     * Testbed prefix.
+     */
     private static String prefix = "";
+    /**
+     * Testbed url.
+     */
     private static String testbedServer = "";
 
+    /**
+     * Constructor.
+     */
+    private PcMonitor() {
+        LOGGER.debug("PcMonitor");
+    }
+
+    /**
+     * main class.
+     *
+     * @param args cmd line arguments
+     */
     public static void main(final String[] args) {
         PropertyConfigurator.configure(Thread.currentThread().getContextClassLoader().getResource("log4j.properties"));
         final Properties properties = new Properties();
@@ -55,10 +82,10 @@ public class PcMonitor {
         hostname = findHostname();
 
         while (true) {
-            runAll();
+            runUnix();
 
             try {
-                Thread.sleep(30 * 60 * 1000);
+                Thread.sleep(INTERVALL);
             } catch (InterruptedException e) {
                 LOGGER.fatal(e);
                 return;
@@ -66,7 +93,10 @@ public class PcMonitor {
         }
     }
 
-    private static void runAll() {
+    /**
+     * Runs all registered jobs
+     */
+    private static void runUnix() {
         final DiskFree diskFree = new DiskFree();
         new RestCommiter(diskFree.getReadings());
         final CpuUsage cpuUsage = new CpuUsage();
@@ -85,12 +115,20 @@ public class PcMonitor {
         new RestCommiter(diskTemp.getReadings());
     }
 
+    /**
+     * Displays an error message to user.
+     */
     private static void errorMessage() {
         LOGGER.fatal("No Property file detected please create a .pcmonitor file in user.home");
         LOGGER.fatal("The property file should contain the testbed_server and prefix");
 
     }
 
+    /**
+     * Gets the hostname from the machine.
+     *
+     * @return the hostname.
+     */
     private static String findHostname() {
         InputStreamReader stream = null;
         try {
@@ -116,16 +154,29 @@ public class PcMonitor {
         return "";
     }
 
-
+    /**
+     * Returns the generated hostname.
+     *
+     * @return the hostname of the machine.
+     */
     public static String getHostname() {
         return hostname;
     }
 
-
+    /**
+     * Returns the prefix read from the property file.
+     *
+     * @return the testbed prefix.
+     */
     public static String getPrefix() {
         return prefix;
     }
 
+    /**
+     * Returns the server url read from the property file.
+     *
+     * @return the server url.
+     */
     public static String getTestbedServer() {
         return testbedServer;
     }

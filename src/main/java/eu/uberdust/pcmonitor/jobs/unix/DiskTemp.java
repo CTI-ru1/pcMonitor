@@ -16,16 +16,25 @@ import java.util.Map;
  * Time: 9:22 PM
  */
 public class DiskTemp extends AbstractJob {
+    /**
+     * LOGGER.
+     */
     private static final org.apache.log4j.Logger LOGGER = org.apache.log4j.Logger.getLogger(DiskTemp.class);
-    private transient final Map<String, Double> disks;
+    /**
+     * Disk Temperatures.
+     */
+    private final transient Map<String, Double> disks;
 
+    /**
+     * Constructor.
+     */
     public DiskTemp() {
         disks = new HashMap<String, Double>();
 
 
         InputStreamReader stream = null;
         try {
-            final Process runtime = Runtime.getRuntime().exec("hddtemp /dev/sda /dev/sdb /dev/sdc /dev/sdd /dev/sde /dev/sdf");
+            final Process runtime = Runtime.getRuntime().exec("hddtemp /dev/sda /dev/sdb /dev/sdc /dev/sdd /dev/sde ");
             runtime.waitFor();
             stream = new InputStreamReader(runtime.getInputStream());
             final BufferedReader reader = new BufferedReader(stream);
@@ -51,7 +60,7 @@ public class DiskTemp extends AbstractJob {
         }
     }
 
-    public Message.NodeReadings getReadings() {
+    public final Message.NodeReadings getReadings() {
         final Message.NodeReadings.Builder readings = Message.NodeReadings.newBuilder();
 
 

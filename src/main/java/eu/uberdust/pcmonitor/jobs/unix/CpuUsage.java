@@ -14,9 +14,18 @@ import java.io.InputStreamReader;
  * Time: 9:22 PM
  */
 public class CpuUsage extends AbstractJob {
+    /**
+     * LOGGER.
+     */
     private static final org.apache.log4j.Logger LOGGER = org.apache.log4j.Logger.getLogger(CpuUsage.class);
+    /**
+     * Cpu usage.
+     */
     private transient double usage;
 
+    /**
+     * Constructor.
+     */
     public CpuUsage() {
 
 
@@ -49,7 +58,7 @@ public class CpuUsage extends AbstractJob {
         }
     }
 
-    public Message.NodeReadings getReadings() {
+    public final Message.NodeReadings getReadings() {
         final Message.NodeReadings.Builder readings = Message.NodeReadings.newBuilder();
 
 

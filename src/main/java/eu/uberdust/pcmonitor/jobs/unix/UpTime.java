@@ -14,11 +14,22 @@ import java.io.InputStreamReader;
  * Time: 9:22 PM
  */
 public class UpTime extends AbstractJob {
+    /**
+     * LOGGER.
+     */
     private static final org.apache.log4j.Logger LOGGER = org.apache.log4j.Logger.getLogger(UpTime.class);
+    /**
+     * Logged in users.
+     */
     private transient double users;
+    /**
+     * Uptime.
+     */
     private transient double time;
 
-
+    /**
+     * Constructor.
+     */
     public UpTime() {
         time = 0;
 
@@ -69,33 +80,30 @@ public class UpTime extends AbstractJob {
         }
     }
 
-    public Message.NodeReadings getReadings() {
+    public final Message.NodeReadings getReadings() {
         final Message.NodeReadings.Builder readings = Message.NodeReadings.newBuilder();
 
-        {
-            final Message.NodeReadings.Reading.Builder reading = Message.NodeReadings.Reading.newBuilder();
-            reading.setNode(PcMonitor.getPrefix() + PcMonitor.getHostname());
-            final StringBuilder capability = new StringBuilder()
-                    .append(PcMonitor.getPrefix())
-                    .append(CAPABILITY_PREFIX)
-                    .append("users");
-            reading.setCapability(capability.toString());
-            reading.setDoubleReading(users);
-            reading.setTimestamp(System.currentTimeMillis());
-            readings.addReading(reading.build());
-        }
-        {
-            final Message.NodeReadings.Reading.Builder reading = Message.NodeReadings.Reading.newBuilder();
-            reading.setNode(PcMonitor.getPrefix() + PcMonitor.getHostname());
-            final StringBuilder capability = new StringBuilder()
-                    .append(PcMonitor.getPrefix())
-                    .append(CAPABILITY_PREFIX)
-                    .append("uptime");
-            reading.setCapability(capability.toString());
-            reading.setDoubleReading(time);
-            reading.setTimestamp(System.currentTimeMillis());
-            readings.addReading(reading.build());
-        }
+        final Message.NodeReadings.Reading.Builder reading1 = Message.NodeReadings.Reading.newBuilder();
+        reading1.setNode(PcMonitor.getPrefix() + PcMonitor.getHostname());
+        final StringBuilder capability1 = new StringBuilder()
+                .append(PcMonitor.getPrefix())
+                .append(CAPABILITY_PREFIX)
+                .append("users");
+        reading1.setCapability(capability1.toString());
+        reading1.setDoubleReading(users);
+        reading1.setTimestamp(System.currentTimeMillis());
+        readings.addReading(reading1.build());
+
+        final Message.NodeReadings.Reading.Builder reading2 = Message.NodeReadings.Reading.newBuilder();
+        reading2.setNode(PcMonitor.getPrefix() + PcMonitor.getHostname());
+        final StringBuilder capability2 = new StringBuilder()
+                .append(PcMonitor.getPrefix())
+                .append(CAPABILITY_PREFIX)
+                .append("uptime");
+        reading2.setCapability(capability2.toString());
+        reading2.setDoubleReading(time);
+        reading2.setTimestamp(System.currentTimeMillis());
+        readings.addReading(reading2.build());
 
         return readings.build();
     }

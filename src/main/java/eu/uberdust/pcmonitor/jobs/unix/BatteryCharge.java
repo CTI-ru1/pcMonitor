@@ -14,9 +14,18 @@ import java.io.InputStreamReader;
  * Time: 9:22 PM
  */
 public class BatteryCharge extends AbstractJob {
+    /**
+     * LOGGER.
+     */
     private static final org.apache.log4j.Logger LOGGER = org.apache.log4j.Logger.getLogger(BatteryCharge.class);
+    /**
+     * the battery charge observed.
+     */
     private transient double charge;
 
+    /**
+     * Constructor.
+     */
     public BatteryCharge() {
 
 
@@ -48,7 +57,7 @@ public class BatteryCharge extends AbstractJob {
         }
     }
 
-    public Message.NodeReadings getReadings() {
+    public final Message.NodeReadings getReadings() {
         if (charge > 0) {
             final Message.NodeReadings.Builder readings = Message.NodeReadings.newBuilder();
 

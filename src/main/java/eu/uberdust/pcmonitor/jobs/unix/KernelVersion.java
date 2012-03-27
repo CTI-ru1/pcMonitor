@@ -14,10 +14,15 @@ import java.io.InputStreamReader;
  * Time: 9:22 PM
  */
 public class KernelVersion extends AbstractJob {
+    /**
+     * LOGGER.
+     */
     private static final org.apache.log4j.Logger LOGGER = org.apache.log4j.Logger.getLogger(KernelVersion.class);
     private transient String kernel;
 
-
+    /**
+     * Constructor.
+     */
     public KernelVersion() {
 
         InputStreamReader stream = null;
@@ -45,7 +50,7 @@ public class KernelVersion extends AbstractJob {
         }
     }
 
-    public Message.NodeReadings getReadings() {
+    public final Message.NodeReadings getReadings() {
         final Message.NodeReadings.Builder readings = Message.NodeReadings.newBuilder();
 
         final Message.NodeReadings.Reading.Builder reading = Message.NodeReadings.Reading.newBuilder();
