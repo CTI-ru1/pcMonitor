@@ -1,0 +1,47 @@
+ #!/bin/bash
+### BEGIN INIT INFO
+# Provides:          pcMonitor execution
+# Required-Start:
+# Required-Stop:
+# Default-Start:     2 3 4 5
+# Default-Stop:      0 1 6
+# Short-Description: Start daemon at boot time
+# Description:       Enable service provided by daemon.
+### END INIT INFO
+
+name=pcMonitor-1.0.one-jar.jar
+
+pid=$(jps  | grep pcMonitor-1.0.one-jar.jar | cut -d " " -f 1)
+
+case $1 in
+"start")
+  if [ -z $pid ]; then
+    echo "Staring..."
+    java -jar /root/$name > /dev/null &
+    echo "Ok!"
+  else
+    echo "Already running as with PID: $pid"
+  fi
+;;
+"stop")
+  if [ -z $pid ]; then
+    echo "Not running"
+  else
+    echo "Stoping..."
+    kill -9 $pid
+    echo "killed pid $pid"
+
+  fi
+;;
+"status")
+  if [ -z $pid ]; then
+    echo "Not running"
+  else
+    echo "Running with PID: $pid"
+  fi
+;;
+*)
+        echo "pcMonitor for Uberdust Server"
+        echo "commands : {start,stop,status}"
+
+esac
