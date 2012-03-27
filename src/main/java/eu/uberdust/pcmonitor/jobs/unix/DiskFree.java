@@ -71,7 +71,7 @@ public class DiskFree extends AbstractJob {
 
 
         for (final String disk : disks.keySet()) {
-            final Message.NodeReadings.Reading.Builder reading = Message.NodeReadings.Reading.newBuilder();
+            final Message.NodeReadings.Reading.Builder reading = Message.NodeReadings.Reading.newBuilder();//NOPMD
             reading.setNode(PcMonitor.getPrefix() + PcMonitor.getHostname());
             final StringBuilder capability = new StringBuilder()
                     .append(PcMonitor.getPrefix())
