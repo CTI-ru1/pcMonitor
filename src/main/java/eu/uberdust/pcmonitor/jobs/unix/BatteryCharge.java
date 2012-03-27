@@ -15,7 +15,7 @@ import java.io.InputStreamReader;
  */
 public class BatteryCharge extends AbstractJob {
     private static final org.apache.log4j.Logger LOGGER = org.apache.log4j.Logger.getLogger(BatteryCharge.class);
-    private double charge;
+    private transient double charge;
 
     public BatteryCharge() {
 
@@ -53,8 +53,8 @@ public class BatteryCharge extends AbstractJob {
             final Message.NodeReadings.Builder readings = Message.NodeReadings.newBuilder();
 
 
-            Message.NodeReadings.Reading.Builder reading = Message.NodeReadings.Reading.newBuilder();
-            reading.setNode(PcMonitor.getPrefix() + PcMonitor.hostname);
+            final Message.NodeReadings.Reading.Builder reading = Message.NodeReadings.Reading.newBuilder();
+            reading.setNode(PcMonitor.getPrefix() + PcMonitor.getHostname());
             final StringBuilder capability = new StringBuilder()
                     .append(PcMonitor.getPrefix())
                     .append(CAPABILITY_PREFIX)

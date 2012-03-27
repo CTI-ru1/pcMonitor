@@ -17,7 +17,7 @@ import java.util.Map;
  */
 public class DiskTemp extends AbstractJob {
     private static final org.apache.log4j.Logger LOGGER = org.apache.log4j.Logger.getLogger(DiskTemp.class);
-    Map<String, Double> disks;
+    private transient final Map<String, Double> disks;
 
     public DiskTemp() {
         disks = new HashMap<String, Double>();
@@ -57,7 +57,7 @@ public class DiskTemp extends AbstractJob {
 
         for (final String disk : disks.keySet()) {
             final Message.NodeReadings.Reading.Builder reading = Message.NodeReadings.Reading.newBuilder();
-            reading.setNode(PcMonitor.getPrefix() + PcMonitor.hostname);
+            reading.setNode(PcMonitor.getPrefix() + PcMonitor.getHostname());
             final StringBuilder capability = new StringBuilder()
                     .append(PcMonitor.getPrefix())
                     .append(CAPABILITY_PREFIX)

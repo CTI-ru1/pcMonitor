@@ -49,7 +49,7 @@ public class KernelVersion extends AbstractJob {
         final Message.NodeReadings.Builder readings = Message.NodeReadings.newBuilder();
 
         final Message.NodeReadings.Reading.Builder reading = Message.NodeReadings.Reading.newBuilder();
-        reading.setNode(PcMonitor.getPrefix() + PcMonitor.hostname);
+        reading.setNode(PcMonitor.getPrefix() + PcMonitor.getHostname());
         final StringBuilder capability = new StringBuilder()
                 .append(PcMonitor.getPrefix())
                 .append(CAPABILITY_PREFIX)

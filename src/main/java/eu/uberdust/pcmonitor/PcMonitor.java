@@ -24,7 +24,8 @@ import java.util.Properties;
  */
 public class PcMonitor {
     private static final org.apache.log4j.Logger LOGGER = org.apache.log4j.Logger.getLogger(PcMonitor.class);
-    public static String hostname;
+
+    private static String hostname;
     private static String prefix = "";
     private static String testbedServer = "";
 
@@ -51,7 +52,7 @@ public class PcMonitor {
         }
 
         LOGGER.info("starting");
-        hostname = getHostname();
+        hostname = findHostname();
 
         while (true) {
             runAll();
@@ -90,14 +91,13 @@ public class PcMonitor {
 
     }
 
-
-    private static String getHostname() {
+    private static String findHostname() {
         InputStreamReader stream = null;
         try {
             final Process runtime = Runtime.getRuntime().exec("hostname");
             runtime.waitFor();
             stream = new InputStreamReader(runtime.getInputStream());
-            BufferedReader reader = new BufferedReader(stream);
+            final BufferedReader reader = new BufferedReader(stream);
             final String line = reader.readLine();
             while (line != null) {
                 return line;
@@ -115,6 +115,12 @@ public class PcMonitor {
         }
         return "";
     }
+
+
+    public static String getHostname() {
+        return hostname;
+    }
+
 
     public static String getPrefix() {
         return prefix;

@@ -31,30 +31,37 @@ public class RestCommiter {
         if (nodeReadings != null) {
             for (final Message.NodeReadings.Reading reading : nodeReadings.getReadingList()) {
                 if (reading.hasDoubleReading()) {
+                    sendDoubleReading(reading);
 
-                    final StringBuilder urlBuilder = new StringBuilder(PcMonitor.getTestbedServer());
-                    //node/urn:testbed2:test/capability/testingcap/insert/timestamp/11111111000/reading/27.2/
-                    urlBuilder.append("node/").append(reading.getNode())
-                            .append("/capability/").append(reading.getCapability())
-                            .append("/insert/timestamp/").append(reading.getTimestamp())
-                            .append("/reading/").append(reading.getDoubleReading()).append("/");
-
-                    LOGGER.info(urlBuilder.toString());
-                    callUrl(urlBuilder.toString());
                 } else if (reading.hasStringReading()) {
-
-                    final StringBuilder urlBuilder = new StringBuilder(PcMonitor.getTestbedServer());
-                    //node/urn:testbed2:test/capability/testingcap/insert/timestamp/11111111000/reading/27.2/
-                    urlBuilder.append("node/").append(reading.getNode())
-                            .append("/capability/").append(reading.getCapability())
-                            .append("/insert/timestamp/").append(reading.getTimestamp())
-                            .append("/stringreading/").append(reading.getStringReading()).append("/");
-
-                    LOGGER.info(urlBuilder.toString());
-                    callUrl(urlBuilder.toString());
+                    sendStringReading(reading);
                 }
             }
         }
+    }
+
+    private void sendStringReading(final Message.NodeReadings.Reading reading) {
+        final StringBuilder urlBuilder = new StringBuilder(PcMonitor.getTestbedServer());
+        //node/urn:testbed2:test/capability/testingcap/insert/timestamp/11111111000/reading/27.2/
+        urlBuilder.append("node/").append(reading.getNode())
+                .append("/capability/").append(reading.getCapability())
+                .append("/insert/timestamp/").append(reading.getTimestamp())
+                .append("/stringreading/").append(reading.getStringReading()).append("/");
+
+        LOGGER.info(urlBuilder.toString());
+        callUrl(urlBuilder.toString());
+    }
+
+    private void sendDoubleReading(final Message.NodeReadings.Reading reading) {
+        final StringBuilder urlBuilder = new StringBuilder(PcMonitor.getTestbedServer());
+        //node/urn:testbed2:test/capability/testingcap/insert/timestamp/11111111000/reading/27.2/
+        urlBuilder.append("node/").append(reading.getNode())
+                .append("/capability/").append(reading.getCapability())
+                .append("/insert/timestamp/").append(reading.getTimestamp())
+                .append("/reading/").append(reading.getDoubleReading()).append("/");
+
+        LOGGER.info(urlBuilder.toString());
+        callUrl(urlBuilder.toString());
     }
 //
 //    /**
@@ -99,7 +106,7 @@ public class RestCommiter {
             httpURLConnection.connect();
 
             if (httpURLConnection.getResponseCode() == HttpURLConnection.HTTP_OK) {
-                LOGGER.debug("Added " + urlString);
+                LOGGER.debug(new StringBuilder().append("Added ").append(urlString).toString());
             } else {
                 final StringBuilder errorBuilder = new StringBuilder("Problem ");
                 errorBuilder.append("with ").append(urlString);

@@ -15,8 +15,8 @@ import java.io.InputStreamReader;
  */
 public class MemFree extends AbstractJob {
     private static final org.apache.log4j.Logger LOGGER = org.apache.log4j.Logger.getLogger(MemFree.class);
-    private transient double memFree;
-    private transient double swapFree;
+    private transient double memory;
+    private transient double swap;
 
 
     public MemFree() {
@@ -31,10 +31,10 @@ public class MemFree extends AbstractJob {
             while (line != null) {
                 if (line.startsWith("MemFree")) {
                     final String[] parts = line.split("\\s+");
-                    memFree = Double.parseDouble(parts[1]);
+                    memory = Double.parseDouble(parts[1]);
                 } else if (line.startsWith("SwapFree")) {
                     final String[] parts = line.split("\\s+");
-                    swapFree = Double.parseDouble(parts[1]);
+                    swap = Double.parseDouble(parts[1]);
                 }
                 line = reader.readLine();
             }
@@ -56,25 +56,25 @@ public class MemFree extends AbstractJob {
 
         {
             final Message.NodeReadings.Reading.Builder reading = Message.NodeReadings.Reading.newBuilder();
-            reading.setNode(PcMonitor.getPrefix() + PcMonitor.hostname);
+            reading.setNode(PcMonitor.getPrefix() + PcMonitor.getHostname());
             final StringBuilder capability = new StringBuilder()
                     .append(PcMonitor.getPrefix())
                     .append(CAPABILITY_PREFIX)
                     .append("memfree");
             reading.setCapability(capability.toString());
-            reading.setDoubleReading(memFree);
+            reading.setDoubleReading(memory);
             reading.setTimestamp(System.currentTimeMillis());
             readings.addReading(reading.build());
         }
         {
             final Message.NodeReadings.Reading.Builder reading = Message.NodeReadings.Reading.newBuilder();
-            reading.setNode(PcMonitor.getPrefix() + PcMonitor.hostname);
+            reading.setNode(PcMonitor.getPrefix() + PcMonitor.getHostname());
             final StringBuilder capability = new StringBuilder()
                     .append(PcMonitor.getPrefix())
                     .append(CAPABILITY_PREFIX)
                     .append("swapfree");
             reading.setCapability(capability.toString());
-            reading.setDoubleReading(swapFree);
+            reading.setDoubleReading(swap);
             reading.setTimestamp(System.currentTimeMillis());
             readings.addReading(reading.build());
         }

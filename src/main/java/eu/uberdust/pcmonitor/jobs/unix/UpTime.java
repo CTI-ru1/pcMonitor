@@ -15,12 +15,12 @@ import java.io.InputStreamReader;
  */
 public class UpTime extends AbstractJob {
     private static final org.apache.log4j.Logger LOGGER = org.apache.log4j.Logger.getLogger(UpTime.class);
-    private Double users;
-    private Double uptime;
+    private transient double users;
+    private transient double time;
 
 
     public UpTime() {
-        uptime = (double) 0;
+        time = 0;
 
         InputStreamReader stream = null;
         try {
@@ -28,7 +28,7 @@ public class UpTime extends AbstractJob {
             runtime.waitFor();
             stream = new InputStreamReader(runtime.getInputStream());
             final BufferedReader reader = new BufferedReader(stream);
-            String line = reader.readLine();
+            final String line = reader.readLine();
             if (line != null) {
                 for (final String part : line.split(",")) {
 
@@ -36,18 +36,18 @@ public class UpTime extends AbstractJob {
                         users = Double.valueOf(part.split("\\s+")[1]);
                     } else if (part.contains("days")) {
                         final String uptimeStr = part.substring(part.indexOf("up") + 2);
-                        uptime += Double.valueOf(uptimeStr.split(" ")[1]) * 24 * 60;
+                        time += Double.valueOf(uptimeStr.split(" ")[1]) * 24 * 60;
                         LOGGER.info(uptimeStr);
                     } else if (part.contains("min")) {
                         final String uptimeStr = part.substring(0, part.indexOf("min"));
-                        uptime += Double.valueOf(uptimeStr);
+                        time += Double.valueOf(uptimeStr);
                         LOGGER.info(uptimeStr);
                     } else if (part.contains(":")) {
                         final String[] uptimeStr = part.split(":");
                         try {
-                            uptime += Double.valueOf(uptimeStr[0]) * 60;
+                            time += Double.valueOf(uptimeStr[0]) * 60;
                             LOGGER.info("+" + Double.valueOf(uptimeStr[0]) * 60);
-                            uptime += Double.valueOf(uptimeStr[1]);
+                            time += Double.valueOf(uptimeStr[1]);
                             LOGGER.info("+" + Double.valueOf(uptimeStr[1]));
                         } catch (final NumberFormatException nfe) {
                             LOGGER.error(nfe);
@@ -74,7 +74,7 @@ public class UpTime extends AbstractJob {
 
         {
             final Message.NodeReadings.Reading.Builder reading = Message.NodeReadings.Reading.newBuilder();
-            reading.setNode(PcMonitor.getPrefix() + PcMonitor.hostname);
+            reading.setNode(PcMonitor.getPrefix() + PcMonitor.getHostname());
             final StringBuilder capability = new StringBuilder()
                     .append(PcMonitor.getPrefix())
                     .append(CAPABILITY_PREFIX)
@@ -86,13 +86,13 @@ public class UpTime extends AbstractJob {
         }
         {
             final Message.NodeReadings.Reading.Builder reading = Message.NodeReadings.Reading.newBuilder();
-            reading.setNode(PcMonitor.getPrefix() + PcMonitor.hostname);
+            reading.setNode(PcMonitor.getPrefix() + PcMonitor.getHostname());
             final StringBuilder capability = new StringBuilder()
                     .append(PcMonitor.getPrefix())
                     .append(CAPABILITY_PREFIX)
                     .append("uptime");
             reading.setCapability(capability.toString());
-            reading.setDoubleReading(uptime);
+            reading.setDoubleReading(time);
             reading.setTimestamp(System.currentTimeMillis());
             readings.addReading(reading.build());
         }
