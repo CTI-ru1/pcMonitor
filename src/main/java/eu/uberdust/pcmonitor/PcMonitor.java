@@ -82,7 +82,7 @@ public final class PcMonitor {
         hostname = findHostname();
 
         while (true) {
-            runUnix();
+            runAll(System.getProperty("os.name"));
 
             try {
                 Thread.sleep(INTERVALL);
@@ -90,6 +90,23 @@ public final class PcMonitor {
                 LOGGER.fatal(e);
                 return;
             }
+        }
+    }
+
+    /**
+     * Based on the os Name runs all available scripts and reports data.
+     *
+     * @param osName the name of the OS.
+     */
+    private static void runAll(final String osName) {
+        if (osName.equals("Linux")) {
+            runUnix();
+        } else if (osName.equals("Mac OS")) {
+            LOGGER.error("unavailable for " + osName);
+        } else if ("Mac OS X".equals(osName)) {
+            LOGGER.error("unavailable for " + osName);
+        } else if (osName.contains("Windows")) {
+            LOGGER.error("unavailable for " + osName);
         }
     }
 
