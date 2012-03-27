@@ -60,4 +60,11 @@ public class CpuUsage extends AbstractJob {
     }
 
 
+    public static void main(String[] args) {
+        CpuUsage item = new CpuUsage();
+        LOGGER.info(item.getReadings());
+
+    }
+
+
 }

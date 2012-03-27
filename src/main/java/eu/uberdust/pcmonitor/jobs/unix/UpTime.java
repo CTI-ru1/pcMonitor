@@ -30,15 +30,15 @@ public class UpTime extends AbstractJob {
             if (line != null) {
                 for (String part : line.split(",")) {
 
-                    if (part.contains("users")) {
+                    if (part.contains("user")) {
                         users = Double.valueOf(part.split("\\s+")[1]);
                     } else if (part.contains("days")) {
                         String uptimeStr = part.substring(part.indexOf("up") + 2);
                         uptime += Double.valueOf(uptimeStr.split(" ")[1]) * 24 * 60;
                         LOGGER.info(uptimeStr);
                     } else if (part.contains("min")) {
-                        String uptimeStr = part.substring(part.indexOf("up") + 2);
-                        uptime += Double.valueOf(uptimeStr.split(" ")[1]) * 60;
+                        String uptimeStr = part.substring(0, part.indexOf("min"));
+                        uptime += Double.valueOf(uptimeStr);
                         LOGGER.info(uptimeStr);
                     } else if (part.contains(":")) {
                         String[] uptimeStr = part.split(":");
