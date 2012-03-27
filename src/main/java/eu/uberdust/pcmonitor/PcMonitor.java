@@ -22,7 +22,7 @@ import java.util.Properties;
  * Date: 3/26/12
  * Time: 9:06 PM
  */
-public class PcMonitor {
+public final class PcMonitor {
     /**
      * LOGGER.
      */
@@ -94,7 +94,7 @@ public class PcMonitor {
     }
 
     /**
-     * Runs all registered jobs
+     * Runs all registered Unix jobs.
      */
     private static void runUnix() {
         final DiskFree diskFree = new DiskFree();
