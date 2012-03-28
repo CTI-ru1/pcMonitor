@@ -11,7 +11,7 @@
 
 name=pcMonitor-1.0.one-jar.jar
 
-pid=$(jps  | grep pcMonitor-1.0.one-jar.jar | cut -d " " -f 1)
+pid=$(ps -ef |  grep pcMonitor-1.0.one-jar.jar | grep -v grep  | awk -F" " '{print $2}')
 
 case $1 in
 "start")
