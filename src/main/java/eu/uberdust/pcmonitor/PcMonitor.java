@@ -1,13 +1,7 @@
 package eu.uberdust.pcmonitor;
 
-import eu.uberdust.pcmonitor.jobs.unix.BatteryCharge;
-import eu.uberdust.pcmonitor.jobs.unix.CpuUsage;
-import eu.uberdust.pcmonitor.jobs.unix.DiskFree;
-import eu.uberdust.pcmonitor.jobs.unix.DiskTemp;
-import eu.uberdust.pcmonitor.jobs.unix.HostAlive;
-import eu.uberdust.pcmonitor.jobs.unix.KernelVersion;
-import eu.uberdust.pcmonitor.jobs.unix.MemFree;
-import eu.uberdust.pcmonitor.jobs.unix.UpTime;
+import eu.uberdust.network.NetworkManager;
+import eu.uberdust.pcmonitor.task.UnixTask;
 import org.apache.log4j.PropertyConfigurator;
 
 import java.io.BufferedReader;
@@ -15,6 +9,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.Properties;
+import java.util.Timer;
 
 /**
  * Created by IntelliJ IDEA.
@@ -43,6 +38,7 @@ public final class PcMonitor {
      * Testbed url.
      */
     private static String testbedServer = "";
+    private static Timer timer;
 
     /**
      * Constructor.
@@ -69,7 +65,7 @@ public final class PcMonitor {
                 errorMessage();
             }
 
-            testbedServer = (String) properties.get("testbed_server");
+            testbedServer = ((String) properties.get("testbed_server"));
 
             prefix = (String) properties.get("prefix");
 
@@ -81,16 +77,12 @@ public final class PcMonitor {
         LOGGER.info("starting");
         hostname = findHostname();
 
-        while (true) {
-            runAll(System.getProperty("os.name"));
+        NetworkManager.getInstance().start(testbedServer, 3);
 
-            try {
-                Thread.sleep(INTERVALL);
-            } catch (InterruptedException e) {
-                LOGGER.fatal(e);
-                return;
-            }
-        }
+        timer = new Timer();
+
+        runAll(System.getProperty("os.name"));
+
     }
 
     /**
@@ -100,7 +92,7 @@ public final class PcMonitor {
      */
     private static void runAll(final String osName) {
         if ("Linux".equals(osName)) {
-            runUnix();
+            timer.scheduleAtFixedRate(new UnixTask(), 10000, INTERVALL);
         } else if ("Mac OS".equals(osName)) {
             LOGGER.error("unavailable for " + osName);
         } else if ("Mac OS X".equals(osName)) {
@@ -108,28 +100,6 @@ public final class PcMonitor {
         } else if ("Windows".contains(osName)) {
             LOGGER.error("unavailable for " + osName);
         }
-    }
-
-    /**
-     * Runs all registered Unix jobs.
-     */
-    private static void runUnix() {
-        final DiskFree diskFree = new DiskFree();
-        new RestCommiter(diskFree.getReadings());
-        final CpuUsage cpuUsage = new CpuUsage();
-        new RestCommiter(cpuUsage.getReadings());
-        final BatteryCharge batteryCharge = new BatteryCharge();
-        new RestCommiter(batteryCharge.getReadings());
-        final HostAlive hostAlive = new HostAlive();
-        new RestCommiter(hostAlive.getReadings());
-        final KernelVersion kernelVersion = new KernelVersion();
-        new RestCommiter(kernelVersion.getReadings());
-        final MemFree memFree = new MemFree();
-        new RestCommiter(memFree.getReadings());
-        final UpTime uptime = new UpTime();
-        new RestCommiter(uptime.getReadings());
-        final DiskTemp diskTemp = new DiskTemp();
-        new RestCommiter(diskTemp.getReadings());
     }
 
     /**
