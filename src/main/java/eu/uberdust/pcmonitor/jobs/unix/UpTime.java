@@ -2,6 +2,7 @@ package eu.uberdust.pcmonitor.jobs.unix;
 
 import eu.uberdust.communication.protobuf.Message;
 import eu.uberdust.pcmonitor.PcMonitor;
+import eu.uberdust.pcmonitor.jobs.AbstractJob;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -86,6 +87,8 @@ public class UpTime extends AbstractJob {
      * @return the readings generated as Message.NodeReadings,
      */
     public final Message.NodeReadings getReadings() {
+        LOGGER.info("getReadings");
+
         final Message.NodeReadings.Builder readings = Message.NodeReadings.newBuilder();
 
         final Message.NodeReadings.Reading.Builder reading1 = Message.NodeReadings.Reading.newBuilder();

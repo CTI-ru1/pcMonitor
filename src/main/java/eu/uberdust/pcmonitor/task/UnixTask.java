@@ -1,17 +1,20 @@
 package eu.uberdust.pcmonitor.task;
 
-import eu.uberdust.network.NetworkManager;
-import eu.uberdust.pcmonitor.jobs.unix.BatteryCharge;
-import eu.uberdust.pcmonitor.jobs.unix.CpuUsage;
-import eu.uberdust.pcmonitor.jobs.unix.DiskFree;
-import eu.uberdust.pcmonitor.jobs.unix.DiskTemp;
-import eu.uberdust.pcmonitor.jobs.unix.HostAlive;
-import eu.uberdust.pcmonitor.jobs.unix.KernelVersion;
-import eu.uberdust.pcmonitor.jobs.unix.MemFree;
-import eu.uberdust.pcmonitor.jobs.unix.UpTime;
+import org.quartz.Job;
+import org.quartz.JobDetail;
+import org.quartz.Scheduler;
+import org.quartz.SchedulerException;
+import org.quartz.SchedulerFactory;
+import org.quartz.Trigger;
+import org.quartz.impl.StdSchedulerFactory;
 
-import java.io.IOException;
-import java.util.TimerTask;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+
+import static org.quartz.JobBuilder.newJob;
+import static org.quartz.SimpleScheduleBuilder.simpleSchedule;
+import static org.quartz.TriggerBuilder.newTrigger;
 
 /**
  * Created by IntelliJ IDEA.
@@ -19,62 +22,50 @@ import java.util.TimerTask;
  * Date: 3/29/12
  * Time: 5:34 PM
  */
-public class UnixTask extends TimerTask {
+public class UnixTask extends AbstractOsTask {
     /**
      * LOGGER.
      */
     private static final org.apache.log4j.Logger LOGGER = org.apache.log4j.Logger.getLogger(UnixTask.class);
+    private static final long TIME_OFFSET1 = 5000;
 
-    @Override
-    public void run() {
+    public UnixTask() {
+        final SchedulerFactory schedulerFactory = new StdSchedulerFactory();
+        final Scheduler sched;
+        final List<JobDetail> jobs = new ArrayList<JobDetail>();
+        final List<Trigger> triggers = new ArrayList<Trigger>();
+        try {
+            sched = schedulerFactory.getScheduler();
 
-        final DiskFree diskFree = new DiskFree();
-        try {
-            NetworkManager.getInstance().sendNodeReading(diskFree.getReadings());
-        } catch (IOException e) {
-            LOGGER.error(e);
-        }
-        final CpuUsage cpuUsage = new CpuUsage();
-        try {
-            NetworkManager.getInstance().sendNodeReading(cpuUsage.getReadings());
-        } catch (IOException e) {
-            LOGGER.error(e);
-        }
-        final BatteryCharge batteryCharge = new BatteryCharge();
-        try {
-            NetworkManager.getInstance().sendNodeReading(batteryCharge.getReadings());
-        } catch (IOException e) {
-            LOGGER.error(e);
-        }
-        final HostAlive hostAlive = new HostAlive();
-        try {
-            NetworkManager.getInstance().sendNodeReading(hostAlive.getReadings());
-        } catch (IOException e) {
-            LOGGER.error(e);
-        }
-        final KernelVersion kernelVersion = new KernelVersion();
-        try {
-            NetworkManager.getInstance().sendNodeReading(kernelVersion.getReadings());
-        } catch (IOException e) {
-            LOGGER.error(e);
-        }
-        final MemFree memFree = new MemFree();
-        try {
-            NetworkManager.getInstance().sendNodeReading(memFree.getReadings());
-        } catch (IOException e) {
-            LOGGER.error(e);
-        }
-        final UpTime uptime = new UpTime();
-        try {
-            NetworkManager.getInstance().sendNodeReading(uptime.getReadings());
-        } catch (IOException e) {
-            LOGGER.error(e);
-        }
-        final DiskTemp diskTemp = new DiskTemp();
-        try {
-            NetworkManager.getInstance().sendNodeReading(diskTemp.getReadings());
-        } catch (IOException e) {
+            ArrayList<Class> list = getJobClasses("unix");
+
+
+            for (Class aClass : list) {
+                LOGGER.info(aClass);
+
+
+                jobs.add(newJob((Class<? extends Job>) aClass)
+                        .withIdentity(aClass + "Job", aClass + "group")
+                        .build());
+                triggers.add(newTrigger()
+                        .withIdentity(aClass + "Trigger", aClass + "group")
+                        .startAt(new Date(System.currentTimeMillis() + TIME_OFFSET1))
+                        .withSchedule(simpleSchedule()
+                                .withIntervalInMinutes(30)
+                                .repeatForever()).build());
+
+
+            }
+            for (int i = 0; i < jobs.size(); i++) {
+                sched.scheduleJob(jobs.get(i), triggers.get(i));
+            }
+
+            LOGGER.info("jobcount:" + sched.getCurrentlyExecutingJobs().size());
+            sched.start();
+
+        } catch (SchedulerException e) {
             LOGGER.error(e);
         }
     }
+
 }

@@ -2,6 +2,7 @@ package eu.uberdust.pcmonitor.jobs.unix;
 
 import eu.uberdust.communication.protobuf.Message;
 import eu.uberdust.pcmonitor.PcMonitor;
+import eu.uberdust.pcmonitor.jobs.AbstractJob;
 
 /**
  * Created by IntelliJ IDEA.
@@ -48,6 +49,5 @@ public class KernelVersion extends AbstractJob {
 
         return readings.build();
     }
-
 
 }

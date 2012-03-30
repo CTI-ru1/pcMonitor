@@ -58,19 +58,18 @@ public final class PcMonitor {
 
         try {
             properties.load(new FileInputStream(System.getProperty("user.home") + "/.pcmonitor"));
-            if (!properties.contains("testbed_server")) {
-                errorMessage();
-            }
-            if (!properties.contains("prefix")) {
-                errorMessage();
-            }
 
+//            if (!properties.contains("testbed_server")) {
+//                errorMessage("testbed_server");
+//            }
             testbedServer = ((String) properties.get("testbed_server"));
 
+//            if (!properties.contains("prefix")) {
+//                errorMessage("prefix");
+//            }
             prefix = (String) properties.get("prefix");
-
         } catch (IOException e) {
-            errorMessage();
+            errorMessage("");
             return;
         }
 
@@ -92,7 +91,7 @@ public final class PcMonitor {
      */
     private static void runAll(final String osName) {
         if ("Linux".equals(osName)) {
-            timer.scheduleAtFixedRate(new UnixTask(), 10000, INTERVALL);
+            new UnixTask();
         } else if ("Mac OS".equals(osName)) {
             LOGGER.error("unavailable for " + osName);
         } else if ("Mac OS X".equals(osName)) {
@@ -105,9 +104,13 @@ public final class PcMonitor {
     /**
      * Displays an error message to user.
      */
-    private static void errorMessage() {
-        LOGGER.fatal("No Property file detected please create a .pcmonitor file in user.home");
-        LOGGER.fatal("The property file should contain the testbed_server and prefix");
+    private static void errorMessage(final String error) {
+        if ("".equals(error)) {
+            LOGGER.fatal("No Property file detected please create a .pcmonitor file in " + System.getProperty("user.home"));
+        } else {
+            LOGGER.fatal("The property file " + System.getProperty("user.home") + "/.pcmonitor should contain " + error);
+        }
+        System.exit(0);
 
     }
 

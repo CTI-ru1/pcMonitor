@@ -2,6 +2,7 @@ package eu.uberdust.pcmonitor.jobs.unix;
 
 import eu.uberdust.communication.protobuf.Message;
 import eu.uberdust.pcmonitor.PcMonitor;
+import eu.uberdust.pcmonitor.jobs.AbstractJob;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -85,6 +86,5 @@ public class DiskFree extends AbstractJob {
         }
         return readings.build();
     }
-
 
 }
