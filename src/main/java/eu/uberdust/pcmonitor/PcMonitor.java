@@ -43,7 +43,7 @@ public final class PcMonitor {
     /**
      * Constructor.
      */
-    private PcMonitor() {
+    public PcMonitor() {
         LOGGER.debug("PcMonitor");
     }
 
@@ -119,7 +119,7 @@ public final class PcMonitor {
      *
      * @return the hostname.
      */
-    private static String findHostname() {
+    public static String findHostname() {
         InputStreamReader stream = null;
         try {
             final Process runtime = Runtime.getRuntime().exec("hostname");

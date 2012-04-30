@@ -16,7 +16,7 @@ pid=$(ps -ef |  grep pcMonitor-1.0.one-jar.jar | grep -v grep  | awk -F" " '{pri
 case $1 in
 "start")
   if [ -z $pid ]; then
-    echo "Staring..."
+    echo -n "Staring..."
     java -jar /root/$name > /dev/null &
     echo "Ok!"
   else
@@ -27,7 +27,7 @@ case $1 in
   if [ -z $pid ]; then
     echo "Not running"
   else
-    echo "Stoping..."
+    echo -n "Stoping..."
     kill -9 $pid
     echo "killed pid $pid"
 

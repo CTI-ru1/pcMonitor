@@ -32,14 +32,17 @@ public class ProcessesInfo extends AbstractJob {
 
         InputStreamReader stream = null;
         try {
-            final Process runtime = Runtime.getRuntime().exec("ps hax | wc -l");
+            final Process runtime = Runtime.getRuntime().exec("ps hax");
             runtime.waitFor();
             stream = new InputStreamReader(runtime.getInputStream());
             final BufferedReader reader = new BufferedReader(stream);
-            final String line = reader.readLine();
-            if (line != null) {
-                tasks = Integer.parseInt(line);
+            String line = reader.readLine();
+            tasks = 0;
+            while (line != null) {
+                tasks++;
+                line = reader.readLine();
             }
+
         } catch (IOException e) {
             LOGGER.fatal(e);
         } catch (InterruptedException e) {
@@ -59,8 +62,6 @@ public class ProcessesInfo extends AbstractJob {
      * @return the readings generated as Message.NodeReadings,
      */
     public final Message.NodeReadings getReadings() {
-        LOGGER.info("getReadings");
-
         final Message.NodeReadings.Builder readings = Message.NodeReadings.newBuilder();
 
         final Message.NodeReadings.Reading.Builder reading1 = Message.NodeReadings.Reading.newBuilder();
