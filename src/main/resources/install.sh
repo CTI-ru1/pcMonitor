@@ -1,5 +1,7 @@
 
 #copy files
+apt-get install ntp sysstat hddtemp
+
 sudo cp pcMonitor /etc/init.d/
 sudo cp pcMonitor-1.0.one-jar.jar /root/pcMonitor-1.0.one-jar.jar
 sudo cp pcmonitor.conf /root/.pcmonitor

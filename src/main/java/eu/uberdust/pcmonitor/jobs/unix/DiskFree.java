@@ -44,7 +44,7 @@ public class DiskFree extends AbstractJob {
                 final String[] parts = line.split("\\s+");
                 if (parts[1].equals("ext4")) {
                     final String name = parts[0].substring(parts[0].lastIndexOf('/') + 1);
-                    final Double space = Double.valueOf(parts[4].substring(0, parts[5].indexOf('%')));
+                    final Double space = Double.valueOf(parts[5].substring(0, parts[5].indexOf('%')));
                     disks.put(name, space);
                 }
                 line = reader.readLine();
